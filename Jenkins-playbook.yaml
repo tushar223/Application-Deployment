@@ -1,0 +1,43 @@
+---
+- hosts: jenkins-master
+  become: true
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Add Jenkins GPG key
+      apt_key:
+        url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+        state: present
+
+    - name: Add Jenkins APT repository
+      apt_repository:
+        repo: 'deb https://pkg.jenkins.io/debian-stable binary/'
+        state: present
+
+    - name: Update apt cache after adding Jenkins repo
+      apt:
+        update_cache: yes
+
+    - name: Install Java
+      apt:
+        name: openjdk-21-jre
+        state: present
+
+    - name: Install Jenkins
+      apt:
+        name: jenkins
+        state: present
+
+    - name: Start Jenkins service
+      service:
+        name: jenkins
+        state: started
+
+    - name: Enable Jenkins to start at boot
+      service:
+        name: jenkins
+        enabled: yes
